@@ -1,7 +1,6 @@
 export interface CreateUserRequest {
   firstName: string;
   lastName?: string;
-  email: string;
+  userName: string;
   password: string;
-  profileImageUrl?: string;
 }

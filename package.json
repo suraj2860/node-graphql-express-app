@@ -2,9 +2,9 @@
   "name": "graphql-demo-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "node build/server.js",
     "dev": "tsc-watch --onSuccess \"npm start\""
   },
   "keywords": [],
@@ -13,12 +13,18 @@
   "dependencies": {
     "@apollo/server": "^4.11.3",
     "@prisma/client": "^6.3.0",
+    "bcrypt": "^5.1.1",
     "express": "^4.21.2",
-    "graphql": "^16.10.0"
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.0",
+    "dotenv": "^16.4.7",
     "prisma": "^6.3.0",
     "tsc-watch": "^6.2.1",
     "tsx": "^4.19.2",

@@ -1,3 +1,5 @@
-export const mutations = `#graphql
-    createUser(firstName: String!, lastName: String, email: String!, password: String!): String
+import gql from "graphql-tag";
+
+export const mutations = `
+    createUser(firstName: String!, lastName: String, userName: String!, password: String!): String
 `;

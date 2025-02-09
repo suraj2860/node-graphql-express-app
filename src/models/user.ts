@@ -59,7 +59,7 @@ User.init(
     tableName: "users", // Table name in DB
     timestamps: true,
     underscored: true, // Ensures all fields use snake_case in DB
-    paranoid: true, // Enables soft deletes
+    // paranoid: true, // Enables soft deletes
   }
 );
 

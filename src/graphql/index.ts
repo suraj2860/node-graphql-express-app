@@ -1,5 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { User } from "./user";
+import AppConstants from "../config/app.constants";
 
 async function createAplloGraphqlServer() {
   // Create GraphQL Server
@@ -20,6 +21,19 @@ async function createAplloGraphqlServer() {
       Mutation: {
         ...User.resolvers.mutations,
       },
+    },
+    includeStacktraceInErrorResponses: process.env.NODE_ENV !== AppConstants.PROD_ENVIRONMENT, // Show stacktrace only in dev
+    formatError: (error) => {
+      if (process.env.NODE_ENV === AppConstants.PROD_ENVIRONMENT) {
+        return {
+          message: error.message || AppConstants.INTERNAL_SERVER_ERROR_MESSAGE,
+          extensions: {
+            code:
+              error.extensions?.code || AppConstants.INTERNAL_SERVER_ERROR_CODE,
+          },
+        };
+      }
+      return error; // Keep full error details in dev mode
     },
   });
 

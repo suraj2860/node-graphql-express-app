@@ -1,4 +1,4 @@
-import { gql } from "graphql-tag";
+import { gql } from 'graphql-tag';
 
 export const typeDefs = `
   type User {
@@ -9,6 +9,11 @@ export const typeDefs = `
     isActive: Boolean!
     createdAt: String!
     updatedAt: String!
+  }
+
+  type AuthPayload {
+    user: User!  
+    authToken: String!
   }
   
   input CreateUserInput{
@@ -23,5 +28,10 @@ export const typeDefs = `
     firstName: String
     lastName: String
     isActive: Boolean
+  }
+
+  input AuthenticateUserInput {
+    userName: String!
+    password: String!
   }
 `;

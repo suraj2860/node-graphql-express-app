@@ -1,6 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { User } from "./user";
-import AppConstants from "../config/app.constants";
+import AppConstants from "../config/constants";
 
 async function createAplloGraphqlServer() {
   // Create GraphQL Server

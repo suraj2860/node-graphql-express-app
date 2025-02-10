@@ -1,50 +1,48 @@
-import { CreateUserRequest } from "./interfaces/create-user-req";
-import { UpdateUserRequest } from "./interfaces/update-user-req";
-import UserService from "../../services/user.service";
-import { UserInputError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import bcrypt from 'bcrypt';
+import { CreateUserRequest, UpdateUserRequest, AuthenticateUserRequest, AuthenticateUserResponse, User } from './interfaces/index';
+import UserService from '../../services/user.service';
+import { generateToken } from '../../utils/jwt';
+import { errorHandler } from '../../utils/errorHandler';
 
 const queries = {
-  hello: () => "Hello, world!",
+  hello: () => 'Hello, world!',
 
   getUsers: async () => {
     try {
       const users = await UserService.getUsers();
       if (!users || users.length === 0) {
-        throw new UserInputError("No users found.");
+        throw new UserInputError('No users found.');
       }
       return users;
     } catch (error) {
-      if (error instanceof UserInputError) throw error;
-      throw new Error("Failed to fetch users.");
+      errorHandler(error, 'Failed to fetch users');
     }
   },
 
   getUserById: async (_: any, { id }: { id: number }) => {
     try {
-      if (!id) throw new UserInputError("User ID is required.");
+      if (!id) throw new UserInputError('User ID is required.');
 
       const user = await UserService.getUserById(id);
       if (!user) throw new UserInputError(`User with ID ${id} not found.`);
 
       return user;
     } catch (error) {
-      if (error instanceof UserInputError) throw error;
-      throw new Error("Failed to fetch user by ID.");
+      errorHandler(error, 'Failed to fetch user by ID');
     }
   },
 
   getUserByUserName: async (_: any, { userName }: { userName: string }) => {
     try {
-      if (!userName) throw new UserInputError("Username is required.");
+      if (!userName) throw new UserInputError('Username is required.');
 
       const user = await UserService.getUserByUserName(userName);
-      if (!user)
-        throw new UserInputError(`User with username "${userName}" not found.`);
+      if (!user) throw new UserInputError(`User with username "${userName}" not found.`);
 
       return user;
     } catch (error) {
-      if (error instanceof UserInputError) throw error;
-      throw new Error("Failed to fetch user by username.");
+      errorHandler(error, 'Failed to fetch user by username');
     }
   },
 };
@@ -52,29 +50,22 @@ const queries = {
 const mutations = {
   createUser: async (_: any, { request }: { request: CreateUserRequest }) => {
     try {
-      const existingUser = await UserService.getUserByUserName(
-        request.userName
-      );
+      const existingUser = await UserService.getUserByUserName(request.userName);
       if (existingUser) {
-        console.error("User already exists.");
-        throw new UserInputError(
-          `Username "${request.userName}" is already taken.`
-        );
+        console.error('User already exists.');
+        throw new UserInputError(`Username "${request.userName}" is already taken.`);
       }
 
       const response = await UserService.createUser(request);
       return response.id;
     } catch (error: any) {
-      if (error instanceof UserInputError) throw error;
-
-      console.error("Error creating user:", error);
-      throw new Error("Failed to create user.");
+      errorHandler(error, 'Failed to create user');
     }
   },
   updateUser: async (_: any, { request }: { request: UpdateUserRequest }) => {
     try {
       if (!request.id) {
-        throw new UserInputError("User ID is required.");
+        throw new UserInputError('User ID is required.');
       }
 
       const user = await UserService.getUserById(request.id);
@@ -84,16 +75,13 @@ const mutations = {
 
       return await UserService.updateUser(user, request);
     } catch (error: any) {
-      if (error instanceof UserInputError) throw error;
-
-      console.error("Error updating user:", error);
-      throw new Error("Failed to update user.");
+      errorHandler(error, 'Failed to update user');
     }
   },
   deleteUser: async (_: any, { id }: { id: number }) => {
     try {
       if (!id) {
-        throw new UserInputError("User ID is required.");
+        throw new UserInputError('User ID is required.');
       }
 
       const user = await UserService.getUserById(id);
@@ -105,10 +93,48 @@ const mutations = {
 
       return true;
     } catch (error: any) {
-      if (error instanceof UserInputError) throw error;
+      errorHandler(error, 'Failed to delete user');
+    }
+  },
+  authenticateUser: async (_: any, { request }: { request: AuthenticateUserRequest }): Promise<AuthenticateUserResponse | undefined> => {
+    try {
+      if (!request.userName || !request.password) {
+        throw new UserInputError('Username and password are required.');
+      }
 
-      console.error("Error deleteing user:", error);
-      throw new Error("Failed to delete user.");
+      const user = await UserService.getUserByUserNameInternal(request.userName);
+      if (!user) {
+        throw new AuthenticationError('Invalid credentials.');
+      }
+
+      const isMatch = await bcrypt.compare(request.password, user.password);
+      if (!isMatch) {
+        throw new AuthenticationError('Invalid credentials.');
+      }
+
+      const { password, ...userWithoutPassword } = user.toJSON();
+
+      // const userDetails: User = {
+      //   id: user.id,
+      //   firstName: user.firstName,
+      //   lastName: user.lastName,
+      //   userName: user.userName,
+      //   isActive: user.isActive,
+      //   createdAt: user.createdAt,
+      //   updatedAt: user.updatedAt,
+      //   deletedAt: user.deletedAt ?? null
+      // }
+
+      // console.log({ authToken: generateToken(user), user: userWithoutPassword });
+      
+      const authenticateUserResponse: AuthenticateUserResponse = {
+        authToken: generateToken(user),
+        user: userWithoutPassword,
+      };
+
+      return authenticateUserResponse;
+    } catch (error) {
+      errorHandler(error, 'Failed to authenticate user');
     }
   },
 };

@@ -1,6 +1,9 @@
-import { CreateUserRequest } from "../graphql/user/interfaces/create-user-req";
-import { UpdateUserRequest } from "../graphql/user/interfaces/update-user-req";
-import User from "../models/user";
+import { ApolloError } from 'apollo-server-express';
+import { AuthenticateUserRequest } from '../graphql/user/interfaces/authenticate-user-req';
+import { CreateUserRequest } from '../graphql/user/interfaces/create-user-req';
+import { UpdateUserRequest } from '../graphql/user/interfaces/update-user-req';
+import User from '../models/user';
+import AppConstants from '../config/constants';
 
 class UserService {
   public static async createUser(request: CreateUserRequest) {
@@ -15,39 +18,55 @@ class UserService {
         isActive: true,
       });
     } catch (error: any) {
-      console.error("Error creating user: ", error);
-      throw new Error("An unexpected error occurred while creating the user.");
+      console.error('Error creating user: ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while creating the user.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
+    }
+  }
+
+  public static async authenticateUser(request: AuthenticateUserRequest) {
+    try {
+    } catch (error: any) {
+      console.error('Error authenticating user: ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while authenticating the user.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
     }
   }
 
   public static async getUsers() {
     try {
-      return await User.findAll();
+      return await User.findAll({ attributes: { exclude: ['password'] } });
     } catch (error: any) {
-      console.error("Error fetching users: ", error);
-      throw new Error("An unexpected error occurred while fetching users.");
+      console.error('Error fetching users: ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while fetching users.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
     }
   }
 
   public static async getUserById(id: number) {
     try {
-      return await User.findByPk(id);
+      return await User.findByPk(id, { attributes: { exclude: ['password'] } });
     } catch (error: any) {
-      console.error("Failed to fetch user by Id : ", error);
-      throw new Error(
-        "An unexpected error occurred while fetching user by Id."
-      );
+      console.error('Failed to fetch user by Id : ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while fetching user by Id.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
     }
   }
 
   public static async getUserByUserName(userName: String) {
     try {
+      return await User.findOne({
+        where: { userName },
+        attributes: { exclude: ['password'] },
+      });
+    } catch (error: any) {
+      console.error('Failed to fetch user by userName : ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while fetching user by userName.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
+    }
+  }
+
+  public static async getUserByUserNameInternal(userName: String) {
+    try {
       return await User.findOne({ where: { userName } });
     } catch (error: any) {
-      console.error("Failed to fetch user by userName : ", error);
-      throw new Error(
-        "An unexpected error occurred while fetching user by userName."
-      );
+      console.error('Failed to fetch user by userName : ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while fetching user by userName.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
     }
   }
 
@@ -60,17 +79,19 @@ class UserService {
 
       return user;
     } catch (error: any) {
-      console.error("Failed to update user : ", error);
-      throw new Error("An unexpected error occurred while updating user.");
+      console.error('Failed to update user : ', error.stack || error);
+      throw new ApolloError('An unexpected error occurred while updating user.', AppConstants.INTERNAL_SERVER_ERROR_CODE);
     }
   }
 
   public static async deleteUser(id: number) {
-    try{
+    try {
+    } catch (error: any) {}
+  }
 
-    } catch(error: any){
-
-    }
+  public static async validatePassword(id: number) {
+    try {
+    } catch (error: any) {}
   }
 }
 

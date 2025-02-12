@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const queries = `
-    hello: String
+    healthcheck: String
     getUsers: [User!]!
     getUserById(id: ID!): User!
     getUserByUserName(userName: String!): User!

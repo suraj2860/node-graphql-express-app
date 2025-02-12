@@ -4,11 +4,12 @@ import { CreateUserRequest, UpdateUserRequest, AuthenticateUserRequest, Authenti
 import UserService from '../../services/user.service';
 import { generateToken } from '../../utils/jwt';
 import { errorHandler } from '../../utils/errorHandler';
+import { authGuard } from '../../utils/authGuard';
 
 const queries = {
-  hello: () => 'Hello, world!',
+  healthcheck: () => 'OK',
 
-  getUsers: async () => {
+  getUsers: authGuard(async () => {
     try {
       const users = await UserService.getUsers();
       if (!users || users.length === 0) {
@@ -18,9 +19,9 @@ const queries = {
     } catch (error) {
       errorHandler(error, 'Failed to fetch users');
     }
-  },
+  }),
 
-  getUserById: async (_: any, { id }: { id: number }) => {
+  getUserById: authGuard(async (_: any, { id }: { id: number }) => {
     try {
       if (!id) throw new UserInputError('User ID is required.');
 
@@ -31,9 +32,9 @@ const queries = {
     } catch (error) {
       errorHandler(error, 'Failed to fetch user by ID');
     }
-  },
+  }),
 
-  getUserByUserName: async (_: any, { userName }: { userName: string }) => {
+  getUserByUserName: authGuard( async (_: any, { userName }: { userName: string }) => {
     try {
       if (!userName) throw new UserInputError('Username is required.');
 
@@ -44,11 +45,11 @@ const queries = {
     } catch (error) {
       errorHandler(error, 'Failed to fetch user by username');
     }
-  },
+  }),
 };
 
 const mutations = {
-  createUser: async (_: any, { request }: { request: CreateUserRequest }) => {
+  createUser: authGuard( async (_: any, { request }: { request: CreateUserRequest }) => {
     try {
       const existingUser = await UserService.getUserByUserName(request.userName);
       if (existingUser) {
@@ -61,8 +62,8 @@ const mutations = {
     } catch (error: any) {
       errorHandler(error, 'Failed to create user');
     }
-  },
-  updateUser: async (_: any, { request }: { request: UpdateUserRequest }) => {
+  }),
+  updateUser: authGuard( async (_: any, { request }: { request: UpdateUserRequest }) => {
     try {
       if (!request.id) {
         throw new UserInputError('User ID is required.');
@@ -77,8 +78,8 @@ const mutations = {
     } catch (error: any) {
       errorHandler(error, 'Failed to update user');
     }
-  },
-  deleteUser: async (_: any, { id }: { id: number }) => {
+  }),
+  deleteUser: authGuard( async (_: any, { id }: { id: number }) => {
     try {
       if (!id) {
         throw new UserInputError('User ID is required.');
@@ -95,7 +96,7 @@ const mutations = {
     } catch (error: any) {
       errorHandler(error, 'Failed to delete user');
     }
-  },
+  }),
   authenticateUser: async (_: any, { request }: { request: AuthenticateUserRequest }): Promise<AuthenticateUserResponse | undefined> => {
     try {
       if (!request.userName || !request.password) {
@@ -126,7 +127,7 @@ const mutations = {
       // }
 
       // console.log({ authToken: generateToken(user), user: userWithoutPassword });
-      
+
       const authenticateUserResponse: AuthenticateUserResponse = {
         authToken: generateToken(user),
         user: userWithoutPassword,

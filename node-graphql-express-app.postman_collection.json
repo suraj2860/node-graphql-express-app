@@ -1,0 +1,249 @@
+{
+	"info": {
+		"_postman_id": "44ac0fa3-946c-49df-9c15-7b37e56d5727",
+		"name": "node-graphql-express-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28204494"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "authenticate-user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"if (jsonData.data) {\r",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.data.authenticateUser.authToken);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation AuthenticateUser($request: AuthenticateUserInput) {\r\n    authenticateUser(request: $request) {\r\n        user {\r\n            id\r\n            firstName\r\n            lastName\r\n            userName\r\n            isActive\r\n            createdAt\r\n            updatedAt\r\n        }\r\n        authToken\r\n    }\r\n}\r\n",
+								"variables": "{\r\n    \"request\": {\r\n        \"userName\": \"jack@doe.com\",\r\n        \"password\": \"jack123\"\r\n    }\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetUsers{\r\n    getUsers{\r\n        id\r\n        firstName\r\n        lastName\r\n        userName\r\n        isActive\r\n        createdAt\r\n        updatedAt\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user-by-id",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetUserById($id: ID!) {\r\n    getUserById(id: $id){\r\n        id\r\n        firstName\r\n        lastName\r\n        userName\r\n        isActive\r\n        createdAt\r\n        updatedAt\r\n    }\r\n}",
+								"variables": "{\r\n    \"id\": 2\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user-by-username",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetUserByUserName($userName: String!) {\r\n    getUserByUserName(userName: $userName){\r\n        id\r\n        firstName\r\n        lastName\r\n        userName\r\n        isActive\r\n        createdAt\r\n        updatedAt\r\n    }\r\n}",
+								"variables": "{\r\n    \"userName\": \"jack@doe.com\"\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateUser($request: CreateUserInput){\r\n    createUser(request: $request)\r\n}",
+								"variables": "{\r\n    \"request\": {\r\n        \"firstName\": \"Dan\",\r\n        \"lastName\": \"Woods\",\r\n        \"userName\": \"dan@woods.com\",\r\n        \"password\": \"dan123\"\r\n    }\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation UpdateUser($request: UpdateUserInput){\r\n    updateUser(request: $request){\r\n        id\r\n        firstName\r\n        lastName\r\n        userName\r\n        isActive\r\n        createdAt\r\n        updatedAt\r\n    }\r\n}",
+								"variables": "{\r\n    \"request\": {\r\n        \"id\": \"14\",\r\n        \"isActive\": false\r\n    }\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation DeleteUser($id: ID!){\r\n    deleteUser(id: $id)\r\n}",
+								"variables": "{\r\n    \"id\": 6\r\n}"
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}",
+							"host": [
+								"{{app_url}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "healthcheck",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query Healthcheck {\r\n    healthcheck\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}",
+					"host": [
+						"{{app_url}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "app_url",
+			"value": "http://localhost:8844/graphql",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
